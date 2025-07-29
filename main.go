@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/memory"
 )
@@ -27,7 +27,10 @@ func main() {
 	// Create conversation memory
 	chatMemory := memory.NewConversationBuffer()
 
-	fmt.Println("Chat Application Started! Type 'quit' to exit.")
+	// Create conversation chain
+	chain := chains.NewConversation(llm, chatMemory)
+
+	fmt.Println("Enhanced Chat Application Started! Type 'quit' to exit.")
 
 	scanner := bufio.NewScanner(os.Stdin)
 	ctx := context.Background()
@@ -43,20 +46,13 @@ func main() {
 			break
 		}
 
-		// Get response from LLM
-		response, err := llm.GenerateContent(ctx, []llms.MessageContent{
-			llms.TextParts(llms.ChatMessageTypeHuman, input),
-		})
+		// Use chain for stateful conversation
+		result, err := chains.Run(ctx, chain, input)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			continue
 		}
 
-		aiResponse := response.Choices[0].Content
-		fmt.Printf("AI: %s\n\n", aiResponse)
-
-		// Store conversation in memory
-		chatMemory.ChatHistory.AddUserMessage(ctx, input)
-		chatMemory.ChatHistory.AddAIMessage(ctx, aiResponse)
+		fmt.Printf("AI: %s\n\n", result)
 	}
 }
