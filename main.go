@@ -15,7 +15,7 @@ import (
 
 func main() {
 	// Initialize LLM
-	// If you wan to use an alternae LLM OPenAI compatible, just set the follwowing environment variables:
+	// If you want to use an alternae LLM OPenAI compatible, just set the follwowing environment variables:
 	// export OPENAI_API_BASE=https://api.openai.com/v1
 	// export OPENAI_MODEL=gpt-3.5-turbo
 	// export OPENAI_API_KEY=your_api_key
